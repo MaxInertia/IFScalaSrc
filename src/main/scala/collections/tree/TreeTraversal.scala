@@ -1,6 +1,4 @@
-package operations.search
-
-import collections.tree.LazyTree
+package collections.tree
 
 import scala.collection.immutable.Queue
 
