@@ -1,6 +1,5 @@
-import collections.tree.{IntTree, LazyTree}
+import collections.tree.{IntTree, LazyTree, TreeTraversal}
 import com.sun.org.apache.xpath.internal.operations.Bool
-import operations.search.TreeTraversal
 
 /**
   * Created by Dorian Thiessen on 2018-03-10.
