@@ -1,4 +1,4 @@
-package operations.search
+package collections.tree
 
 import org.scalameter.api._
 import org.scalameter.picklers.Implicits._
