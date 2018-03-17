@@ -1,10 +1,12 @@
-import collections.tree.{IntTree, LazyTree, TreeTraversal}
+import collections.tree.{IntTree, LazyTree, TreeSearch, TreeTraversal}
 import com.sun.org.apache.xpath.internal.operations.Bool
 
 /**
   * Created by Dorian Thiessen on 2018-03-10.
   */
 object Main extends App {
+
+  println("Min: "+ Integer.MIN_VALUE)
 
   def treeTests(): Unit = {
     val tree = new IntTree(4)
@@ -70,11 +72,11 @@ object Main extends App {
     val t = IntTree.generate(intTreeSize)
 
     val mmC = new CallCounter
-    val best1 = TreeTraversal.minimax(t, depthLimit)(evaluator, mmC.applyThenInc(isTerminal))
+    val best1 = TreeSearch.miniMax(evaluator, mmC.applyThenInc(isTerminal))(t, depthLimit)
     println("MM: "+ best1)
 
     val abC = new CallCounter
-    val ab = TreeTraversal.alphabeta(evaluator, abC.applyThenInc(isTerminal)) _
+    val ab = TreeSearch.alphaBeta(evaluator, abC.applyThenInc(isTerminal)) _
     println("AB: "+ ab(t, depthLimit, true))
 
     println(s"mmC: ${mmC.n}\nabC: ${abC.n}\n")

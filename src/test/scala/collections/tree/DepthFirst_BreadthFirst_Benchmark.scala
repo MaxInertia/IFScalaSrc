@@ -2,7 +2,7 @@ package collections.tree
 
 import org.scalameter.api._
 import org.scalameter.picklers.Implicits._
-import collections.tree.IntTree
+import collections.tree.{IntTree, TreeTraversal}
 
 /**
   * Created by Dorian Thiessen on 2018-03-12.
