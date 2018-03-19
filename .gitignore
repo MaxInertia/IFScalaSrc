@@ -199,3 +199,5 @@ target/scala-2.12/resolution-cache/reports/default-algorithms$sources-optional.x
 target/scala-2.12/resolution-cache/reports/default-algorithms$sources-compile.xml
 target/scala-2.12/resolution-cache/reports/default-algorithms$sources-compile-internal.xml
 target/scala-2.12/resolution-cache/default/algorithms_2.12/0.1/resolved.xml.xml
+project/target/
+target/

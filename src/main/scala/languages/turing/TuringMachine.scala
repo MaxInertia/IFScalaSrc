@@ -1,6 +1,6 @@
-package languages
+package languages.turing
 
-import languages.TurningMachine.Tape
+import languages.turing.TurningMachine.Tape
 
 import scala.collection.mutable
 
@@ -53,5 +53,20 @@ then you can also be convinced that it cannot be done in PT on a random access m
  */
 
 object Main extends App {
+
+  // RAM
+  // - var lookup
+  // - var assignment
+  // - + and -
+  // - a test / conditional
+  // - derefence
+
+  // TM
+  // - read one cell
+  // - change contents
+  // - move head left or right
+
+  // P_RAM
+  // P_TM
 
 }
