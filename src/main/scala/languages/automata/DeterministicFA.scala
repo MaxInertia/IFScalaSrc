@@ -2,7 +2,7 @@ package languages.automata
 import languages.Word
 
 class DeterministicFA(override val q0: FAState,
-                      override val fqs: Set[FAState]) extends FiniteAutomaton {
+                      override val fQs: Set[FAState]) extends FiniteAutomaton {
 
   def delta(c: Char, q: FAState): Option[FAState] = q.on(c)
   def deltaHat(w: Word, q: FAState): Option[FAState] =
@@ -12,5 +12,8 @@ class DeterministicFA(override val q0: FAState,
       case None    => None
     }
 
-  def accepts(w: Word): Boolean = ???
+  def accepts(w: Word): Boolean = deltaHat(w, q0) match {
+    case Some(q) => fQs.contains(q)
+    case None    => false
+  }
 }

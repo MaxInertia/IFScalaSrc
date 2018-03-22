@@ -8,7 +8,7 @@ trait FAState {
 
 trait FiniteAutomaton extends Language[Regular] {
   val q0: FAState
-  val fqs: Set[FAState]
+  val fQs: Set[FAState]
 
   // Provided
   override def contains(w: Word): Boolean = accepts(w)

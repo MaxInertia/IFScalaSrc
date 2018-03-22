@@ -1,8 +1,10 @@
+import collections.{Defines, Implicitly}
+
 package object languages {
 
   type Word = String
 
-  // Phantom Type
+  // Phantom Types
   sealed trait Type
   trait Unknown extends Type  // May not know if some language L is regular
   trait Regular extends Type
@@ -12,20 +14,24 @@ package object languages {
     def contains(w: Word): Boolean
   }
 
-  //trait RegularLanguage extends Language
-  //trait NonRegularLanguage extends Language
-
-  // A implicitly or explicitly defines a discrete instance of B
-  // - 'A' can produce a 'B'
-  // - 'A' can be used in place of a 'B'
-  trait Defines[A, B] {
-    def produce(a: A): B
-
+  /*implicit object DFALanguage extends Defines[DeterministicFA, Implicitly, Language[Regular]] {
+    override def produce(a: DeterministicFA): Language[Regular] = ??? // TODO: Implement DFA->Lang
   }
+  implicit object NFALanguage extends Defines[NonDeterministicFA, Implicitly, Language[Regular]] {
+    override def produce(a: NonDeterministicFA): Language[Regular] = ??? // TODO: Implement NFA->Lang
+  }
+  implicit object EpsilonNFALanguage extends Defines[EpsilonNFA, Implicitly, Language[Regular]] {
+    override def produce(a: EpsilonNFA): Language[Regular] = ??? // TODO: Implement eNFA->Lang
+  }*/
 
-  /*implicit object DFADefinesLang extends Defines[DeterministicFA, Language[Regular]]
-  implicit object NFADefinesLang extends Defines[NonDeterministicFA, Language[Regular]]
-  implicit object EpsilonNFADefinesLang extends Defines[EpsilonNFA, Language[Regular]]*/
-
+  object Language {
+    // How do I say...
+    // For 'A' and 'B' such that
+    // there is an implicit instance of
+    // Defines[A, _, B] ???
+    def from[A, B](a: A): B =  ??? /*{
+      lazy val converter = implicitly[Defines[A, _, B]]
+      converter.produce(a)
+    }*/
+  }
 }
-
