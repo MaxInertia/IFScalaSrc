@@ -1,6 +1,9 @@
 package experimental.nearest
 
 case class Points(P: Array[Point2D]) {
+
+  var op: (Array[Point2D], Array[Point2D]) => Unit = (_, _) => {}
+
   def closestPair(): (Point2D, Point2D, Double) = {
 
     def loop(Px: Array[Point2D], Py: Array[Point2D]): (Point2D, Point2D) = {
@@ -16,6 +19,7 @@ case class Points(P: Array[Point2D]) {
         print("\n\n\n")
       }
       //details()
+      op(Px, Py)
 
       if(Px.length == 3) {
         val d01 = Px(0).distTo(Px(1))
@@ -57,12 +61,15 @@ case class Points(P: Array[Point2D]) {
       for(i <- Py.indices) {
         val p = Py(i)
         if(Py(i).xsIndex < half) {
-          //p.ysIndex = Qy.length + 1
+          p.ysIndex = Qy.length + 1
           Qy = Qy :+ p
         } else {
-          //p.ysIndex = Ry.length + 1
+          p.ysIndex = Ry.length + 1
           Ry = Ry :+ p
         }
+        //print(s"xi: ${p.xsIndex} -> ")
+        if(p.xsIndex >= half) p.xsIndex = p.xsIndex - half
+        //println(p.xsIndex)
       }
 
       def show(): Unit = {
@@ -114,7 +121,7 @@ case class Points(P: Array[Point2D]) {
       S.foreach(p => print(s"(${p.x}, ${p.y}), "))
       print("\n\n")*/
 
-      for(i <- S.indices) {
+      /*for(i <- S.indices) {
         for(j <- (i+1) until i+16) {
           if(i != j && j < S.length) {
             val dist = S(i).distTo(S(j))
@@ -125,9 +132,10 @@ case class Points(P: Array[Point2D]) {
             }
           }
         }
-      }
-
-      (p1, p2)
+      }*/
+      val (bf1, bf2, dist) = NaiveBrute.closestPair(S)
+      if(dist < delta) (bf1, bf2)
+      else (p1, p2)
     }
 
     // CONSTRUCT Px and Py

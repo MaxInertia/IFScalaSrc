@@ -14,19 +14,13 @@ object NearestPair_Benchmark extends AbstractBenchmark {
 
   performance of "Points" in {
 
-
-    using(indices) in {
+    /*using(indices) in {
       i =>
-    }
+    }*/
 
     measure method "bruteForce" in {
       using(e_sizes) in {
         r => {
-          var count = 0
-          val evaluatorCounter: Int => Double = (x: Int) => {
-            count += 1
-            x.toDouble
-          }
 
         }
       }
@@ -34,12 +28,6 @@ object NearestPair_Benchmark extends AbstractBenchmark {
     measure method "alphaBeta" in {
       using(e_sizes) in {
         r => {
-          var count = 0
-          val evaluatorCounter: Int => Double = (x: Int) => {
-            count+=1
-            x.toDouble
-          }
-
 
         }
       }

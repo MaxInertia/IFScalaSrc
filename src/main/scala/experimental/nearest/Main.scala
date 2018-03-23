@@ -5,20 +5,43 @@ import scala.util.Random
 // SAT Solvers
 
 object Main extends App {
-
-  val n = 200
-  val points = Array.fill(n){Point2D(Random.nextDouble * 100*n, Random.nextDouble * 100*n)}
+  /*
+  val n = 40
+  val points = Array.fill(n){Point2D(Random.nextDouble * 100, Random.nextDouble * 100)}
 
   // Efficient Algorithm Result
-  val effResult = Points(points).closestPair()
+  //val effResult = Points(points).closestPair()
 
   // Brute Force Result
-  val bfResult = NaiveBrute.closestPair(points)
+  val bfResult = NaiveBrute.closestPair1(points)
 
-  Util.showAndCompare(effResult, bfResult)
+  //Util.showAndCompare(effResult, bfResult)
 
+  val bf2Result = NaiveBrute.closestPair(points)
+
+  Util.showAndCompare(bf2Result, bfResult)
+  */
   // ComparisonRepeater
-  Util.repeatComparison(1000, 100)
+  //Util.repeatComparison(20, 1000)
+
+  def view(a: Array[Point2D], b: Array[Point2D]): Unit = {
+    println("Px: " + a.length)
+    print("\t")
+    a.foreach(p => print(s"(${p.x}, ${p.y}), "))
+    print("\n")
+
+    println("Py: " + b.length)
+    print("\t")
+    b.foreach(p => print(s"(${p.x}, ${p.y}), "))
+    print("\n\n")
+  }
+
+  /*Util.atCaseDo(13, 10000)(
+    fn = view,
+    (a, b) => a._3 != b._3
+  )*/
+
+  Util.repeatComparison(1000, 1000)
 }
 
 object Util {
@@ -48,9 +71,9 @@ object Util {
     println
   }
 
-  def repeatComparison(repititions: Int, points: Int): Unit = {
+  def repeatComparison(points: Int, repititions: Int): Unit = {
     var failures = 0
-    for(i <- 0 until points) {
+    for(i <- 0 until repititions) {
       val P = Array.fill(points){Point2D(
         Random.nextDouble * 100*points,
         Random.nextDouble * 100*points)}
@@ -62,10 +85,39 @@ object Util {
       val bfResult = NaiveBrute.closestPair(P)
 
       if(effResult._3 != bfResult._3) {
-        println(s"Failed: ${effResult._3} != ${bfResult._3}")
+        if(bfResult._3 < effResult._3) print("Failed: ")
+        else print("FAILED(eff>bf) ???? : ")
+        println(s"${effResult._3} != ${bfResult._3}")
         failures += 1
       }
     }
     println(s"Ran $repititions instances, failed $failures times.")
+  }
+
+  def atCaseDo[T](pCount: Int, maxAttempts: Int)
+                 (fn: (Array[Point2D], Array[Point2D]) => Unit,
+                  check: (ResultTriple, ResultTriple) => Boolean): Unit = {
+    for (i <- 0 until maxAttempts) {
+      // Create random points
+      val points = Array.fill(pCount) {
+        Point2D(
+          Random.nextDouble * 100,
+          Random.nextDouble * 100)
+      }
+
+      // Efficient Algorithm Result
+      val P = Points(points)
+      val effResult = P.closestPair()
+
+      // Brute Force Result
+      val bfResult = NaiveBrute.closestPair(points)
+
+      if(check(effResult, bfResult)) {
+        P.op = fn
+        val effResult = P.closestPair()
+        showAndCompare(effResult, bfResult)
+        return
+      }
+    }
   }
 }
