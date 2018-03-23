@@ -13,8 +13,8 @@ object NearestKPoints extends App {
   }
 
 
-  val n = 20
-  val points = Array.fill(n){Point2D(Random.nextInt(n), Random.nextInt(n))}
+  val n = 200
+  val points = Array.fill(n){Point2D(Random.nextInt(n*100), Random.nextInt(n*100))}
   println(points.length)
 
   def d(p1: Point2D, p2: Point2D): Double = math.sqrt(
@@ -37,10 +37,10 @@ object NearestKPoints extends App {
         Py.foreach(p => print(s"(${p.x}, ${p.y}), "))
         print("\n\n\n")
       }
-      details()
+      //details()
 
       if(Px.length == 3) {
-        println("Px length: "+Px.length)
+        //println("Px length: "+Px.length)
         val d01 = d(Px(0), Px(1))
         val d02 = d(Px(0), Px(2))
         val d12 = d(Px(1), Px(2))
@@ -52,7 +52,7 @@ object NearestKPoints extends App {
           else return (Px(1), Px(2))
         }
      } else if(Px.length == 2) return (Px(0), Px(1))
-      println("Px length: "+Px.length)
+      //println("Px length: "+Px.length)
 
       // TODO: Improve split?
       // Shouldn't have to traverse the list more than once.
@@ -110,24 +110,49 @@ object NearestKPoints extends App {
         Ry.foreach(p => print(s"(${p.x}, ${p.y}), "))
         print("\n")
       }
-      show()
+      //show()
 
-      val (q0, q1) = loop(Qx, Qy)
-      val (r0, r1) = loop(Rx, Ry)
-      println(q0 +" "+ q1 +" "+ r0 +" "+ r1)
+      val (q1, q2) = loop(Qx, Qy)
+      val (r1, r2) = loop(Rx, Ry)
+      //println(q1 +" "+ q2 +" "+ r1 +" "+ r2)
       def min(a: Double, b: Double): Double = if(a<b) a else b
 
-      val delta = min(d(q0, q1), d(r0, r1)) // Minimum distance found in this stage
+      var (p1, p2): (Point2D, Point2D) = (null, null)
+      var delta = Double.MaxValue // Minimum distance found in this stage
+      if(d(q1, q2) < d(r1, r2)) {
+        delta = d(q1, q2)
+        p1 = q1
+        p2 = q2
+      } else {
+        delta = d(r1, r2)
+        p1 = r1
+        p2 = r2
+      }
+
       val xEndQ = Qx.last.x
       // TODO: Optimize by Q.reverse.takewhile and R.takewhile
       val S = Py.filter(p => {math.abs(p.x - xEndQ) <= delta})
 
-      println("S: "+S.length)
+      println("S: "+ S.length)
       print("\t")
       S.foreach(p => print(s"(${p.x}, ${p.y}), "))
-      print("\n")
+      print("\n\n")
 
-      (q0, q1)
+
+      for(i <- S.indices) {
+        for(j <- (i+1) until i+16) {
+          if(i != j && j < S.length) {
+            val dist = d(S(i), S(j))
+            if (dist < delta) {
+              delta = dist
+              p1 = S(i)
+              p2 = S(j)
+            }
+          }
+        }
+      }
+
+      (p1, p2)
     }
 
     // CONSTRUCT Px and Py
@@ -149,6 +174,9 @@ object NearestKPoints extends App {
   val (bruteP1, bruteP2, bruteDist) = bruteClosest(points)
   println(s"BruteF Pair: $bruteP1 and $bruteP2, distance: $bruteDist")
 
+  println("\nPoints:")
+  points.foreach(p => print(s"(${p.x}, ${p.y}), "))
+
   // TODO: Determine if this can be generalized to N-dimensional-points
   // 1D: O(nlogn) sort + single traversal
   // 2D: O(nlogn) sort + DAQ with O(n) work per level (including combining results)
@@ -160,15 +188,15 @@ object NearestKPoints extends App {
     var (bp1, bp2): (Point2D, Point2D) = (null, null)
     var smallestDistance = Double.MaxValue
     for{
-      p1 <- P
-      p2 <- P
-      if p1 != p2
+      i <- P.indices
+      j <- P.indices
+      if i != j
     } {
-      val dist = d(p1, p2)
+      val dist = d(P(i), P(j))
       if(dist < smallestDistance) {
         smallestDistance = dist
-        bp1 = p1
-        bp2 = p2
+        bp1 = P(i)
+        bp2 = P(j)
       }
     }
     (bp1, bp2, smallestDistance)
