@@ -26,7 +26,7 @@ object NearestPair_Benchmark extends AbstractBenchmark {
       }
     }*/
 
-    measure method "betterBruteForce" in {
+    measure method "bruteForce" in {
       using(sizes) in {
         r => {
           //TODO: Factor out point creation
