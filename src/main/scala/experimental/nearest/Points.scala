@@ -121,7 +121,8 @@ case class Points(P: Array[Point2D]) {
       S.foreach(p => print(s"(${p.x}, ${p.y}), "))
       print("\n\n")*/
 
-      /*for(i <- S.indices) {
+      // TODO: Optimize by not comparing pairs of points from the same recursive call (Q's and R's)
+      for(i <- S.indices) {
         for(j <- (i+1) until i+16) {
           if(i != j && j < S.length) {
             val dist = S(i).distTo(S(j))
@@ -132,10 +133,11 @@ case class Points(P: Array[Point2D]) {
             }
           }
         }
-      }*/
-      val (bf1, bf2, dist) = NaiveBrute.closestPair(S)
+      }
+      (p1, p2)
+      /*val (bf1, bf2, dist) = NaiveBrute.closestPair1(S)
       if(dist < delta) (bf1, bf2)
-      else (p1, p2)
+      else (p1, p2)*/
     }
 
     // CONSTRUCT Px and Py

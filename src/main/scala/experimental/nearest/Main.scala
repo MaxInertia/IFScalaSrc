@@ -82,7 +82,7 @@ object Util {
       val effResult = Points(P).closestPair()
 
       // Brute Force Result
-      val bfResult = NaiveBrute.closestPair(P)
+      val bfResult = NaiveBrute.closestPair2(P)
 
       if(effResult._3 != bfResult._3) {
         if(bfResult._3 < effResult._3) print("Failed: ")
@@ -110,7 +110,7 @@ object Util {
       val effResult = P.closestPair()
 
       // Brute Force Result
-      val bfResult = NaiveBrute.closestPair(points)
+      val bfResult = NaiveBrute.closestPair2(points)
 
       if(check(effResult, bfResult)) {
         P.op = fn

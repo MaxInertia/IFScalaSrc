@@ -21,7 +21,7 @@ object NaiveBrute {
     (bp1, bp2, smallestDistance)
   }
 
-  def closestPair(P: Array[Point2D]): (Point2D, Point2D, Double) = {
+  def closestPair2(P: Array[Point2D]): (Point2D, Point2D, Double) = {
     var (bp1, bp2): (Point2D, Point2D) = (null, null)
     var smallestDistance = Double.MaxValue
     for{
