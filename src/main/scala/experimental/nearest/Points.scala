@@ -7,18 +7,6 @@ case class Points(P: Array[Point2D]) {
   def closestPair(): (Point2D, Point2D, Double) = {
 
     def loop(Px: Array[Point2D], Py: Array[Point2D]): (Point2D, Point2D) = {
-      def details(): Unit = {
-        println("Px: " + Px.length)
-        print("\t")
-        Px.foreach(p => print(s"(${p.x}, ${p.y}), "))
-        print("\n")
-
-        println("Py: " + Py.length)
-        print("\t")
-        Py.foreach(p => print(s"(${p.x}, ${p.y}), "))
-        print("\n\n\n")
-      }
-      //details()
       op(Px, Py)
 
       if(Px.length == 3) {
@@ -34,11 +22,6 @@ case class Points(P: Array[Point2D]) {
         }
       } else if(Px.length == 2) return (Px(0), Px(1))
 
-      // TODO: Improve split?
-      // Shouldn't have to traverse the list more than once.
-      // TODO: Don't need this step at all? Combined with next step
-      //val (q, r) = Px.splitAt(Px.length/2)
-
       val half = Px.length/2
 
       var Qx = Array.fill[Point2D](half){null}
@@ -46,18 +29,15 @@ case class Points(P: Array[Point2D]) {
       var Rx = Array.fill[Point2D](Px.length - half){null}
       var Ry = Array[Point2D]()
 
-      // X's
+      // X's: Qx and Rx
       for(i <- 0 until half) {
-        //Px(i).xsIndex = i
         Qx(i) = Px(i)
       }
       for(i <- half until Px.length) {
-        //Px(i).xsIndex = i - half
         Rx(i - half) = Px(i)
       }
 
-      // Y's
-      var (qc, rc) = (0, 0) // q-counter and r-counter
+      // Y's: Qy and Ry
       for(i <- Py.indices) {
         val p = Py(i)
         if(Py(i).xsIndex < half) {
@@ -67,41 +47,17 @@ case class Points(P: Array[Point2D]) {
           p.ysIndex = Ry.length + 1
           Ry = Ry :+ p
         }
-        //print(s"xi: ${p.xsIndex} -> ")
         if(p.xsIndex >= half) p.xsIndex = p.xsIndex - half
-        //println(p.xsIndex)
       }
 
-      def show(): Unit = {
-        println("Qx: " + Qx.length)
-        print("\t")
-        Qx.foreach(p => print(s"(${p.x}, ${p.y}), "))
-        print("\n")
-
-        println("Qy: " + Qy.length)
-        print("\t")
-        Qy.foreach(p => print(s"(${p.x}, ${p.y}), "))
-        print("\n")
-
-        println("Rx: " + Rx.length)
-        print("\t")
-        Rx.foreach(p => print(s"(${p.x}, ${p.y}), "))
-        print("\n")
-
-        println("Ry: " + Ry.length)
-        print("\t")
-        Ry.foreach(p => print(s"(${p.x}, ${p.y}), "))
-        print("\n")
-      }
-      //show()
-
+      // Recursive calls
       val (q1, q2) = loop(Qx, Qy)
       val (r1, r2) = loop(Rx, Ry)
-      //println(q1 +" "+ q2 +" "+ r1 +" "+ r2)
-      def min(a: Double, b: Double): Double = if(a<b) a else b
 
+      // Find and store min from recursive calls
+      def min(a: Double, b: Double): Double = if(a<b) a else b
       var (p1, p2): (Point2D, Point2D) = (null, null)
-      var delta = Double.MaxValue // Minimum distance found in this stage
+      var delta = Double.MaxValue
       if(q1.distTo(q2) < r1.distTo(r2)) {
         delta = q1.distTo(q2)
         p1 = q1
@@ -112,18 +68,13 @@ case class Points(P: Array[Point2D]) {
         p2 = r2
       }
 
+      // Compare min from recursive calls with possible overlap
       val xEndQ = Qx.last.x
       // TODO: Optimize by Q.reverse.takewhile and R.takewhile
       val S = Py.filter(p => {math.abs(p.x - xEndQ) <= delta})
-
-      /*println("S: "+ S.length)
-      print("\t")
-      S.foreach(p => print(s"(${p.x}, ${p.y}), "))
-      print("\n\n")*/
-
       // TODO: Optimize by not comparing pairs of points from the same recursive call (Q's and R's)
       for(i <- S.indices) {
-        for(j <- (i+1) until i+16) {
+        for(j <- (i+1) until i+17) { // Max 16 iterations
           if(i != j && j < S.length) {
             val dist = S(i).distTo(S(j))
             if (dist < delta) {
@@ -135,20 +86,19 @@ case class Points(P: Array[Point2D]) {
         }
       }
       (p1, p2)
-      /*val (bf1, bf2, dist) = NaiveBrute.closestPair1(S)
-      if(dist < delta) (bf1, bf2)
-      else (p1, p2)*/
     }
 
     // CONSTRUCT Px and Py
-    val Px = P.sortWith(_.x < _.x)
     var i = 0
-    Px.foreach{p => p.xsIndex = i; i+=1}
-    val Py = Px.sortWith(_.y < _.y)
+    val Px = P.sortWith(_.x < _.x) // Sort points: O(n log n)
+    Px.foreach{p => p.xsIndex = i; i+=1} // Init each points x-index
     i = 0
-    Py.foreach{p => p.ysIndex = i; i+=1}
+    val Py = Px.sortWith(_.y < _.y) // Sort points: O(n log n)
+    Py.foreach{p => p.ysIndex = i; i+=1} // Init each points y-index
+
     // CALL LOOP
     val (p1, p2) = loop(Px, Py)
+
     // RETURN
     (p1, p2, p1.distTo(p2))
   }
