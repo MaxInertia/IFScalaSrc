@@ -1,6 +1,6 @@
-package experimental
+package experimental.fp
 
-import experimental.AdvancedFP.Point2D
+import experimental.fp.AdvancedFP.Point2D
 
 /**
   * Created by Dorian Thiessen on 2018-03-21.

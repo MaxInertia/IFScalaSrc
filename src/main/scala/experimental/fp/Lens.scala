@@ -1,4 +1,4 @@
-package experimental
+package experimental.fp
 
 /**
   * Created by Dorian Thiessen on 2018-03-22.
