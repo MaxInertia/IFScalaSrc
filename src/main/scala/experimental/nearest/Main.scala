@@ -1,5 +1,6 @@
 package experimental.nearest
 
+import scala.concurrent.Await
 import scala.util.Random
 
 // SAT Solvers
@@ -48,7 +49,7 @@ object Main extends App {
 
   def nearestForAll(n: Int): Unit = {
     val rawPoints = Array.fill(n){Point2D(Random.nextDouble * 100, Random.nextDouble * 100)}
-    val npc = Points(rawPoints)
+    val npc = Points2D(rawPoints)
     npc.closestToEach()
     var missing = 0
     for(p <- npc.P) {
@@ -59,12 +60,97 @@ object Main extends App {
     }
     println(s"$missing out of $n points are missing nearest neighbors")
   }
-  nearestForAll(100)
+  /*nearestForAll(100)
   nearestForAll(1000)
   nearestForAll(2000)
   nearestForAll(3000)
   nearestForAll(4000)
-  nearestForAll(10000)
+  nearestForAll(10000)*/
+
+  def parallelNearestPair(n: Int): Unit = {
+
+    val rawPoints = Array.fill(n){Point2D(Random.nextDouble * 100, Random.nextDouble * 100)}
+    val npc = ParPoints(rawPoints)
+    val futurePX = npc.xSort(npc.P)
+    val futurePY = npc.ySort(npc.P)
+
+    val t0 = System.nanoTime()
+    import scala.concurrent.duration._
+    val pX = Await.result(futurePX, 2.seconds)
+    val pY = Await.result(futurePY, 2.seconds)
+
+    val t1 = System.nanoTime()
+    println("Elapsed time: " + (t1 - t0) + "ns")
+    for(p <- pX) print(p+", ")
+    println
+    for(p <- pY) print(p+", ")
+    println
+
+    val t2 = System.nanoTime()
+    val pX2 = rawPoints.sortWith(_.x < _.x)
+    val pY2 = rawPoints.sortWith(_.y < _.y)
+    val t3 = System.nanoTime()
+    println("Elapsed time: " + (t3 - t2) + "ns")
+  }
+  //parallelNearestPair(10)
+  /*for(i <- Array(1000, 2000, 5000, 10000, 20000, 50000, 100000)) {
+    timeCompare(i)
+    println
+  }*/
+
+  def timeCompare(n: Int): Unit = {
+    import scala.concurrent.duration._
+
+    println(s"Points: $n")
+    val rawPoints = Array.fill(n){Point2D(Random.nextDouble * 100, Random.nextDouble * 100)}
+
+    val npc = ParPoints(rawPoints)
+    val futurePX = npc.xSort(npc.P)
+    val futurePY = npc.ySort(npc.P)
+
+    val t0 = System.nanoTime()
+    val pX = Await.result(futurePX, 2.seconds)
+    val pY = Await.result(futurePY, 2.seconds)
+    val t1 = System.nanoTime()
+
+    val t2 = System.nanoTime()
+    val pX2 = rawPoints.sortWith(_.x < _.x)
+    val pY2 = rawPoints.sortWith(_.y < _.y)
+    val t3 = System.nanoTime()
+
+    println(s"Par: ${t1-t0}ns")
+    println(s"Seq: ${t3-t2}ns")
+    if((t1-t0) < (t3 - t2)) println("PAR WINS")
+    else println("SEQ WINS")
+  }
+
+  def threeD(n: Int): Unit = {
+    val rawPoints = Array.fill(n){Point3D(
+      Random.nextDouble * 100,
+      Random.nextDouble * 100,
+      Random.nextDouble * 100)}
+
+    val npc = Points3D(rawPoints)
+
+    val t0 = System.nanoTime()
+    val (p1, p2, dist) = npc.closestPair()
+    val t1 = System.nanoTime()
+
+    val t2 = System.nanoTime()
+    val (bf1, bf2, bfDist) = NaiveBrute.closestPair3D(rawPoints)
+    val t3 = System.nanoTime()
+
+    println(s"Eff-3D: ${t1-t0}ns")
+    println(s"\t$p1 - $p2 @ $dist")
+    println(s"BrF-3D: ${t3-t2}ns")
+    println(s"\t$bf1 - $bf2 @ $bfDist")
+    assert(dist == bfDist)
+  }
+
+  //threeD(100)
+
+  //Util.repeatComparison3D(10, 1000)
+  Util.repeatComparison3D(1000, 1000)
 }
 
 object Util {
@@ -102,10 +188,34 @@ object Util {
         Random.nextDouble * 100*points)}
 
       // Efficient Algorithm Result
-      val effResult = Points(P).closestPair()
+      val effResult = Points2D(P).closestPair()
 
       // Brute Force Result
-      val bfResult = NaiveBrute.closestPair2(P)
+      val bfResult = NaiveBrute.closestPair2D(P)
+
+      if(effResult._3 != bfResult._3) {
+        if(bfResult._3 < effResult._3) print("Failed: ")
+        else print("FAILED(eff>bf) ???? : ")
+        println(s"${effResult._3} != ${bfResult._3}")
+        failures += 1
+      }
+    }
+    println(s"Ran $repititions instances, failed $failures times.")
+  }
+
+  def repeatComparison3D(points: Int, repititions: Int): Unit = {
+    var failures = 0
+    for(i <- 0 until repititions) {
+      val P = Array.fill(points){Point3D(
+        Random.nextDouble * 100,
+        Random.nextDouble * 100,
+        Random.nextDouble * 100)}
+
+      // Efficient Algorithm Result
+      val effResult = Points3D(P).closestPair()
+
+      // Brute Force Result
+      val bfResult = NaiveBrute.closestPair3D(P)
 
       if(effResult._3 != bfResult._3) {
         if(bfResult._3 < effResult._3) print("Failed: ")
@@ -129,11 +239,11 @@ object Util {
       }
 
       // Efficient Algorithm Result
-      val P = Points(points)
+      val P = Points2D(points)
       val effResult = P.closestPair()
 
       // Brute Force Result
-      val bfResult = NaiveBrute.closestPair2(points)
+      val bfResult = NaiveBrute.closestPair2D(points)
 
       if(check(effResult, bfResult)) {
         P.op = fn

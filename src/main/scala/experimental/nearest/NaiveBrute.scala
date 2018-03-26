@@ -21,8 +21,25 @@ object NaiveBrute {
     (bp1, bp2, smallestDistance)
   }
 
-  def closestPair2(P: Array[Point2D]): (Point2D, Point2D, Double) = {
+  def closestPair2D(P: Array[Point2D]): (Point2D, Point2D, Double) = {
     var (bp1, bp2): (Point2D, Point2D) = (null, null)
+    var smallestDistance = Double.MaxValue
+    for{
+      i <- P.indices
+      j <- i+1 until P.length
+    } {
+      val dist = P(i).distTo(P(j))
+      if(dist < smallestDistance) {
+        smallestDistance = dist
+        bp1 = P(i)
+        bp2 = P(j)
+      }
+    }
+    (bp1, bp2, smallestDistance)
+  }
+
+  def closestPair3D(P: Array[Point3D]): (Point3D, Point3D, Double) = {
+    var (bp1, bp2): (Point3D, Point3D) = (null, null)
     var smallestDistance = Double.MaxValue
     for{
       i <- P.indices

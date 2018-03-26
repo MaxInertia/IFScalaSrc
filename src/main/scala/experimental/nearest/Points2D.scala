@@ -1,6 +1,7 @@
 package experimental.nearest
 
-case class Points(P: Array[Point2D]) {
+
+case class Points2D(P: Array[Point2D]) {
   // Purpose of this class was to wrap the Points in the extended point class
   // time will tell if there is a better way to do it.
 
@@ -105,7 +106,7 @@ case class Points(P: Array[Point2D]) {
     (p1, p2, p1.distTo(p2))
   }
 
-  def closestToEach(): Unit = {
+  def kClosest(k: Int): Unit = {
 
     def loop(Px: Array[Point2D], Py: Array[Point2D]): (Point2D, Point2D) = {
       op(Px, Py)
@@ -205,8 +206,6 @@ case class Points(P: Array[Point2D]) {
     // RETURN
     (p1, p2, p1.distTo(p2))
   }
+
 }
 
-
-
-object Points {}
