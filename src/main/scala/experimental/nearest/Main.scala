@@ -50,15 +50,15 @@ object Main extends App {
   def nearestForAll(n: Int): Unit = {
     val rawPoints = Array.fill(n){Point2D(Random.nextDouble * 100, Random.nextDouble * 100)}
     val npc = Points2D(rawPoints)
-    npc.closestToEach()
+    //npc.closestToEach()
     var missing = 0
     for(p <- npc.P) {
-      if(p.getNearest._1 == null) {
+      //if(p.getNearest._1 == null) {
         //println("Nearest was not set for this point!")
-        missing += 1
-      }
+        //missing += 1
+      //}
     }
-    println(s"$missing out of $n points are missing nearest neighbors")
+    //println(s"$missing out of $n points are missing nearest neighbors")
   }
   /*nearestForAll(100)
   nearestForAll(1000)
@@ -148,9 +148,66 @@ object Main extends App {
   }
 
   //threeD(100)
-
   //Util.repeatComparison3D(10, 1000)
-  Util.repeatComparison3D(1000, 1000)
+  //Util.repeatComparison3D(1000, 1000)
+
+  val k = 3
+
+  val P = Array.fill(1000) {Point2D(Random.nextDouble * 100, Random.nextDouble * 100)}
+  val ps = Points2D(P)
+  ps.kClosest(k)
+  var daqClosest = Array[Array[(Point2D, Double)]]()
+  for(p <- ps.P) {
+    println(s"$p")
+    var c = 1
+    var nArr = Array[(Point2D, Double)]()
+    for(np <- p.nearest.toArray) {
+      println(s"\t$c: $np")
+      nArr = nArr :+ np
+      c+=1
+    }
+    daqClosest = daqClosest :+ nArr
+  }
+
+  println()
+  def bfkClosest(P: Array[Point2D], k: Int): Unit =
+    for(iS <- P.indices) {
+      val p1 = P(iS)
+      for(iE <- (iS+1) until P.length) {
+        val p2 = P(iE)
+        val dist = p1.distTo(p2)
+        p1.setNear(p2, dist)
+        p2.setNear(p1, dist)
+      }
+    }
+
+  for(p <- P) p.nearest = Leaf
+  bfkClosest(P, k)
+  var bfClosest = Array[Array[(Point2D, Double)]]()
+  for(p <- P) {
+    println(s"$p")
+    var c = 1
+    var nArr = Array[(Point2D, Double)]()
+    val ns = p.nearest.toArray
+    for(i <- 0 until k) {
+      println(s"\t$c: ${ns(i)}")
+      nArr = nArr :+ ns(i)
+      c+=1
+    }
+    bfClosest = bfClosest :+ nArr
+  }
+
+  var diffs = 0
+  var size = 0
+  for(i <- P.indices) {
+    for(j <- 0 until k) {
+      size += 1
+      if(bfClosest(i)(j) != daqClosest(i)(j)) diffs += 1
+    }
+  }
+
+  println(s"Diffs: $diffs / $size")
+  println(s"Found: ${(1.0 - diffs.toDouble/size.toDouble)*100.0}%")
 }
 
 object Util {

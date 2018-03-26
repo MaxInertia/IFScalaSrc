@@ -108,21 +108,23 @@ case class Points2D(P: Array[Point2D]) {
 
   def kClosest(k: Int): Unit = {
 
-    def loop(Px: Array[Point2D], Py: Array[Point2D]): (Point2D, Point2D) = {
-      op(Px, Py)
+    def loop(Px: Array[Point2D], Py: Array[Point2D]): Unit = {
+      //op(Px, Py)
 
-      if(Px.length == 3) {
-        val d01 = Px(0).distTo(Px(1))
-        val d02 = Px(0).distTo(Px(2))
-        val d12 = Px(1).distTo(Px(2))
-        if(d01 < d02) {
-          if(d01 < d12) return (Px(0), Px(1))
-          else return (Px(1), Px(2))
-        } else {
-          if(d02 < d12) return (Px(0), Px(2))
-          else return (Px(1), Px(2))
+      println(s"${Px.length}")
+
+      if(Px.length <= k*k) {
+        for(iS <- Px.indices) {
+          val p1 = Px(iS)
+          for(iE <- (iS+1) until Px.length) {
+            val p2 = Px(iE)
+            val dist = p1.distTo(p2)
+            p1.setNear(p2, dist)
+            p2.setNear(p1, dist)
+          }
         }
-      } else if(Px.length == 2) return (Px(0), Px(1))
+        return
+      }
 
       val half = Px.length/2
 
@@ -153,25 +155,11 @@ case class Points2D(P: Array[Point2D]) {
       }
 
       // Recursive calls
-      val (q1, q2) = loop(Qx, Qy)
-      val (r1, r2) = loop(Rx, Ry)
-
-      // Find and store min from recursive calls
-      def min(a: Double, b: Double): Double = if(a<b) a else b
-      var (p1, p2): (Point2D, Point2D) = (null, null)
-      var delta = Double.MaxValue
-      if(q1.distTo(q2) < r1.distTo(r2)) {
-        delta = q1.distTo(q2)
-        p1 = q1
-        p2 = q2
-      } else {
-        delta = r1.distTo(r2)
-        p1 = r1
-        p2 = r2
-      }
+      loop(Qx, Qy)
+      loop(Rx, Ry)
 
       // Compare min from recursive calls with possible overlap
-      val xEndQ = Qx.last.x
+      /*val xEndQ = Qx.last.x
       // TODO: Optimize by Q.reverse.takewhile and R.takewhile
       val S = Py.filter(p => {math.abs(p.x - xEndQ) <= delta})
       // TODO: Optimize by not comparing pairs of points from the same recursive call (Q's and R's)
@@ -186,10 +174,10 @@ case class Points2D(P: Array[Point2D]) {
             }
           }
         }
-      }
+      }*/
 
-      p1.setNearest(p2)
-      (p1, p2)
+      /*p1.setNearest(p2)
+      (p1, p2)*/
     }
 
     // CONSTRUCT Px and Py
@@ -201,10 +189,7 @@ case class Points2D(P: Array[Point2D]) {
     Py.foreach{p => p.ysIndex = i; i+=1} // Init each points y-index
 
     // CALL LOOP
-    val (p1, p2) = loop(Px, Py)
-
-    // RETURN
-    (p1, p2, p1.distTo(p2))
+    loop(Px, Py)
   }
 
 }
